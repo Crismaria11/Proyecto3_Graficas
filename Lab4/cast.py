@@ -74,8 +74,8 @@ class Raycaster(object):
   def cast_ray(self, a):
     d = 0
     while True:
-      x = int(self.player["x"] + (d * cos(a)))
-      y = int(self.player["y"] + (d * sin(a)))
+      x = self.player["x"] + (d * cos(a))
+      y = self.player["y"] + (d * sin(a))
 
       i = int(x / self.blocksize)
       j = int(y / self.blocksize)
@@ -85,17 +85,33 @@ class Raycaster(object):
         hity = y - j*50
 
         # maxhit = hity
+        hitx = x - int(x+0.5)
+        hity = y - int(y+0.5)
 
-        if 10 < hitx < 40:
-          maxhit = hitx
+        if abs(hity) > abs(hitx):
+          tx = hity * 128
         else:
-          maxhit = hity
+          tx = hitx * 128
 
-        tx = int(maxhit * 128/50)
-        print(tx)
+        print("tx1", tx)
+        # if tx < 0:
+        #   tx += 128
+        # elif tx >= 128:
+        #   tx -= 128
+        tx = int(tx % 128)
+        
+        # if 10 < hitx < 40:
+          
+        #   maxhit = hitx
+        # else:
+        #   maxhit = hity
+
+        # tx = int(maxhit * 128/50)
+        print("tx", tx)
+        # print("y", y)
         return d, self.map[j][i], tx
 
-      self.point(x, y, (255, 255, 255))
+      self.point(int(x), int(y), (255, 255, 255))
       d += 1
 
   def draw_stake(self, x, h, tx, texture):
@@ -207,3 +223,7 @@ while True:
 
   r.render()
   pygame.display.flip()
+
+
+
+
