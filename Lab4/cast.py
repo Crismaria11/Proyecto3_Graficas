@@ -81,34 +81,15 @@ class Raycaster(object):
       j = int(y / self.blocksize)
 
       if self.map[j][i] != ' ':
-        hitx = x - j*50
+        hitx = x - i*50
         hity = y - j*50
 
-        # maxhit = hity
-        hitx = x - int(x+0.5)
-        hity = y - int(y+0.5)
-
-        if abs(hity) > abs(hitx):
-          tx = hity * 128
+        if 1 < hitx < 49:
+          tx = hitx
         else:
-          tx = hitx * 128
+          tx = hity
 
-        print("tx1", tx)
-        # if tx < 0:
-        #   tx += 128
-        # elif tx >= 128:
-        #   tx -= 128
-        tx = int(tx % 128)
-        
-        # if 10 < hitx < 40:
-          
-        #   maxhit = hitx
-        # else:
-        #   maxhit = hity
-
-        # tx = int(maxhit * 128/50)
-        print("tx", tx)
-        # print("y", y)
+        tx = int(tx * 128 / 50)
         return d, self.map[j][i], tx
 
       self.point(int(x), int(y), (255, 255, 255))
