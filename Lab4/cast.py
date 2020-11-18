@@ -1,4 +1,5 @@
 import pygame
+import time
 from math import *
 
 BLACK = (0, 0, 0)
@@ -34,7 +35,12 @@ hand = pygame.image.load('./player.png')
 
 enemies = [
   {
-    "x": 100,
+    "x": 300,
+    "y": 250,
+    "texture": enemy4
+  },
+  {
+    "x": 200,
     "y": 200,
     "texture": enemy4
   }
@@ -125,13 +131,13 @@ class Raycaster(object):
             self.zbuffer[i] = sprite_d
 
   def draw_player(self, xi, yi, w = 150, h = 150):
-	    for x in range(xi, xi + w):
-	      for y in range(yi, yi + h):
-	        tx = int((x - xi) * 32/w)
-	        ty = int((y - yi) * 32/h)
-	        c = hand.get_at((tx, ty))
-	        if c != (152, 0, 136, 255):
-	          self.point(x, y, c)
+    for x in range(xi, xi + w):
+      for y in range(yi, yi + h):
+        tx = int((x - xi) * 32/w)
+        ty = int((y - yi) * 32/h)
+        c = hand.get_at((tx, ty))
+        if c != (152, 0, 136, 255):
+          self.point(x, y, c)
 
   def render(self):
     for x in range(0, 500, self.blocksize):
@@ -166,45 +172,117 @@ class Raycaster(object):
       self.point(enemy["x"], enemy["y"], (0, 0, 0))
       self.draw_sprite(enemy)
 
-    self.draw_player(1000 - 256 - 128, 500 - 256)
+    self.draw_player(1000 - 256 - 128, 500 - 100)
 
+# de acuerdo al tutorial de Python Programming Tutorials
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 500))
 r = Raycaster(screen)
 r.load_map('./map.txt')
 
+def text_objects(text, font):
+  textSurface = font.render(text, True, BLACK)
+  return textSurface, textSurface.get_rect()
 
-while True:
-  screen.fill((0, 0, 0))
+def button(msg,x,y,w,h,ic,ac,action=None):
+  mouse = pygame.mouse.get_pos()
+  click = pygame.mouse.get_pressed()
+  if x+w > mouse[0] > x and y+h > mouse[1] > y:
+    pygame.draw.rect(screen, ac,(x,y,w,h))
 
-  for e in pygame.event.get():
-    if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
-      exit(0)
-    if e.type == pygame.KEYDOWN:
-      if e.key == pygame.K_a:
-        r.player["a"] -= pi/10
-      elif e.key == pygame.K_d:
-        r.player["a"] += pi/10
+    if click[0] == 1 and action != None:
+      if action == "Jugar":
+        jugar()
+      elif action == "Exit":
+        exit(0)
+  else:
+    pygame.draw.rect(screen, ic,(x,y,w,h))
 
-      elif e.key == pygame.K_RIGHT:
-        r.player["y"] += 10
-      elif e.key == pygame.K_LEFT:
-        r.player["y"] -= 10
-      elif e.key == pygame.K_UP:
-        r.player["x"] += 10
-      elif e.key == pygame.K_DOWN:
-        r.player["x"] -= 10
+  smallText = pygame.font.SysFont("comicsansms",20)
+  textSurf, textRect = text_objects(msg, smallText)
+  textRect.center = ( (x+(w/2)), (y+(h/2)) )
+  screen.blit(textSurf, textRect)
 
-      if e.key == pygame.K_f:
-        if screen.get_flags() and pygame.FULLSCREEN:
+  smallText = pygame.font.SysFont("comicsansms",20)
+  textSurf, textRect = text_objects(msg, smallText)
+  textRect.center = ( (x+(w/2)), (y+(h/2)) )
+  screen.blit(textSurf, textRect)
+
+def game_intro():
+  intro = True
+  while intro:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        quit()
+            
+    screen.fill(WHITE)
+    largeText = pygame.font.Font('freesansbold.ttf',100)
+    TextSurf, TextRect = text_objects("Hitler en el castillo", largeText)
+    TextRect.center = ((500),(100))
+    screen.blit(TextSurf, TextRect)
+
+    largeText = pygame.font.Font('freesansbold.ttf',50)
+    TextSurf, TextRect = text_objects("Encuentra el cuadro de Hitler", largeText)
+    TextRect.center = ((500),(275))
+    screen.blit(TextSurf, TextRect)
+
+    button('Jugar', 450, 400, 100, 50, (0, 255, 0), (0, 200, 0), "Jugar")
+
+    pygame.display.update()
+
+def game_congrat():
+  intro = True
+  while intro:
+    for e in pygame.event.get():
+      if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
+        exit(0)    
+    screen.fill(WHITE)
+    largeText = pygame.font.Font('freesansbold.ttf',100)
+    TextSurf, TextRect = text_objects("Ganaste!", largeText)
+    TextRect.center = ((500),(250))
+    screen.blit(TextSurf, TextRect)
+
+    button('Exit', 450, 400, 100, 50, (0, 255, 0), (0, 200, 0), "Exit")
+
+    pygame.display.update()
+
+
+def jugar():
+  while True:
+    screen.fill((0, 0, 0))
+    r.render()
+    for e in pygame.event.get():
+      if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
+        exit(0)
+      if e.type == pygame.KEYDOWN:
+        if e.key == pygame.K_a:
+          r.player["a"] -= pi/10
+        elif e.key == pygame.K_d:
+          r.player["a"] += pi/10
+
+        elif e.key == pygame.K_RIGHT:
+          r.player["y"] += 10
+        elif e.key == pygame.K_LEFT:
+          r.player["y"] -= 10
+        elif e.key == pygame.K_UP:
+          r.player["x"] += 10
+        elif e.key == pygame.K_DOWN:
+          r.player["x"] -= 10
+
+        print(r.player["x"], r.player["y"])
+
+        if r.player["x"] > 365 and r.player["x"] < 395 and r.player["y"] > 65 and r.player["y"] < 115:
+          game_congrat()
+
+        if e.key == pygame.K_f:
+          if screen.get_flags() and pygame.FULLSCREEN:
             pygame.display.set_mode((1000, 500))
-        else:
+          else:
             pygame.display.set_mode((1000, 500),  pygame.DOUBLEBUF|pygame.HWACCEL|pygame.FULLSCREEN)
+      
 
-  r.render()
-  pygame.display.flip()
+    pygame.display.flip()
 
-
-
-
+game_intro()
