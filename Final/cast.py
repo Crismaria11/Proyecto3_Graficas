@@ -32,7 +32,7 @@ enemy3 = pygame.image.load('./sprite3.png')
 enemy4 = pygame.image.load('./sprite4.png')
 
 hand = pygame.image.load('./player.png')
-dog = pygame.image.load('./dog.jpg')
+dog = pygame.image.load('./player.png')
 
 enemies = [
   {
@@ -182,8 +182,8 @@ class Raycaster(object):
       self.point(enemy["x"], enemy["y"], (0, 0, 0))
       self.draw_sprite(enemy)
 
-    self.draw_player(1000 - 256 - 128, 500 - 200)
-    self.draw_dog(1000 - 128 - 128, 500 - 200)
+    self.draw_player(1000 - 256 - 128, 500 - 100)
+    self.draw_dog(1000 - 128, 500 - 150)
 
 # de acuerdo al tutorial de Python Programming Tutorials
 
