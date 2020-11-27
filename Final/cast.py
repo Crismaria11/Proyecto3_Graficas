@@ -273,9 +273,9 @@ def fps_counter(count):
   screen.blit(text,(0,0))
 
 def jugar():
-  # pygame.mixer.music.load('./music.mp3')
-  # pygame.mixer.music.set_volume(0.1)
-  # pygame.mixer.music.play(-1)
+  pygame.mixer.music.load('./music.mp3')
+  pygame.mixer.music.set_volume(0.1)
+  pygame.mixer.music.play(-1)
   while True:
     screen.fill((0, 0, 0))
     r.render()
