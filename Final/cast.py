@@ -16,7 +16,7 @@ wall1 = pygame.image.load('./wall1.png')
 wall2 = pygame.image.load('./wall2.png')
 wall3 = pygame.image.load('./wall3.png')
 wall4 = pygame.image.load('./wall4.png')
-wall5 = pygame.image.load('./wall5.png')
+wall5 = pygame.image.load('./garden.png')
 
 textures = {
   "1": wall1,
@@ -26,24 +26,39 @@ textures = {
   "5": wall5,
 }
 
-enemy1 = pygame.image.load('./sprite1.png')
-enemy2 = pygame.image.load('./sprite2.png')
-enemy3 = pygame.image.load('./sprite3.png')
-enemy4 = pygame.image.load('./sprite4.png')
+friend1 = pygame.image.load('./poke1.png')
+friend2 = pygame.image.load('./poke2.png')
+friend3 = pygame.image.load('./poke3.png')
+friend4 = pygame.image.load('./poke4.png')
+friend5 = pygame.image.load('./poke5.png')
 
 hand = pygame.image.load('./player.png')
-dog = pygame.image.load('./player.png')
 
-enemies = [
+friends = [
   {
-    "x": 300,
-    "y": 250,
-    "texture": enemy4
+    "x": 155,
+    "y": 265,
+    "texture": friend1
   },
   {
-    "x": 200,
-    "y": 200,
-    "texture": enemy4
+    "x": 155,
+    "y": 355,
+    "texture": friend2
+  },
+  {
+    "x": 425,
+    "y": 385,
+    "texture": friend3
+  },
+  {
+    "x": 375,
+    "y": 280,
+    "texture": friend4
+  },
+  {
+    "x": 425,
+    "y": 195,
+    "texture": friend5
   }
 ]
 
@@ -114,7 +129,7 @@ class Raycaster(object):
     sprite_a = atan2((sprite["y"] - self.player["y"]), (sprite["x"] - self.player["x"]))
     sprite_d = ((self.player["x"] - sprite["x"])**2 + (self.player["y"] - sprite["y"])**2) ** 0.5
 	  
-    sprite_size = int(500/sprite_d * 50)
+    sprite_size = int(250/sprite_d * 70)
     
     sprite_x = int(500 + (sprite_a - self.player["a"]) * 500/self.player["fov"] + 250 - sprite_size/2)
 
@@ -123,7 +138,7 @@ class Raycaster(object):
     for x in range(sprite_x, sprite_x + sprite_size):
       for y in range(sprite_y, sprite_y + sprite_size):
         i = x - 500
-        if 500 < x < 1000 and self.zbuffer[i] <= sprite_d:
+        if 500 < x < 1000 and self.zbuffer[i] >= sprite_d:
           tx = int((x - sprite_x) * 128/sprite_size)
           ty = int((y - sprite_y) * 128/sprite_size)
           c = sprite["texture"].get_at((tx, ty))
@@ -137,15 +152,6 @@ class Raycaster(object):
         tx = int((x - xi) * 32/w)
         ty = int((y - yi) * 32/h)
         c = hand.get_at((tx, ty))
-        if c != (152, 0, 136, 255):
-          self.point(x, y, c)
-
-  def draw_dog(self, xi, yi, w = 150, h = 150):
-    for x in range(xi, xi + w):
-      for y in range(yi, yi + h):
-        tx = int((x - xi) * 32/w)
-        ty = int((y - yi) * 32/h)
-        c = dog.get_at((tx, ty))
         if c != (152, 0, 136, 255):
           self.point(x, y, c)
 
@@ -172,18 +178,18 @@ class Raycaster(object):
       h = (500 / (d * cos(a - self.player["a"]))) * 50
 
       self.draw_stake(x, h, tx, textures[m])
+      self.zbuffer[i] = d
 
     for i in range(0, 500):
       self.point(499, i, (0, 0, 0))
       self.point(500, i, (0, 0, 0))
       self.point(501, i, (0, 0, 0))
 
-    for enemy in enemies:
-      self.point(enemy["x"], enemy["y"], (0, 0, 0))
-      self.draw_sprite(enemy)
+    for friend in friends:
+      self.point(friend["x"], friend["y"], (0, 0, 0))
+      self.draw_sprite(friend)
 
-    self.draw_player(1000 - 256 - 128, 500 - 100)
-    self.draw_dog(1000 - 128, 500 - 150)
+    self.draw_player(1000 - 256 - 128, 500 - 200)
 
 # de acuerdo al tutorial de Python Programming Tutorials
 
@@ -191,6 +197,7 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 500))
 r = Raycaster(screen)
 r.load_map('./map.txt')
+clock = pygame.time.Clock()
 
 def text_objects(text, font):
   textSurface = font.render(text, True, BLACK)
@@ -220,6 +227,7 @@ def button(msg,x,y,w,h,ic,ac,action=None):
   textRect.center = ( (x+(w/2)), (y+(h/2)) )
   screen.blit(textSurf, textRect)
 
+
 def game_intro():
   intro = True
   while intro:
@@ -229,13 +237,13 @@ def game_intro():
         quit()
             
     screen.fill(WHITE)
-    largeText = pygame.font.Font('freesansbold.ttf',100)
-    TextSurf, TextRect = text_objects("Hitler en el castillo", largeText)
+    largeText = pygame.font.Font('freesansbold.ttf',90)
+    TextSurf, TextRect = text_objects("Busqueda Pokemon!", largeText)
     TextRect.center = ((500),(100))
     screen.blit(TextSurf, TextRect)
 
-    largeText = pygame.font.Font('freesansbold.ttf',50)
-    TextSurf, TextRect = text_objects("Encuentra el cuadro de Hitler", largeText)
+    largeText = pygame.font.Font('freesansbold.ttf',30)
+    TextSurf, TextRect = text_objects("Los pokemones te guiaran al jardin para terminar", largeText)
     TextRect.center = ((500),(275))
     screen.blit(TextSurf, TextRect)
 
@@ -255,12 +263,19 @@ def game_congrat():
     TextRect.center = ((500),(250))
     screen.blit(TextSurf, TextRect)
 
-    button('Exit', 450, 400, 100, 50, (0, 255, 0), (0, 200, 0), "Exit")
+    button('Salir', 450, 400, 100, 50, (0, 255, 0), (0, 200, 0), "Exit")
 
     pygame.display.update()
 
+def fps_counter(count):
+  font = pygame.font.SysFont(None, 25)
+  text = font.render("FPS: "+str(count), True, BLACK)
+  screen.blit(text,(0,0))
 
 def jugar():
+  # pygame.mixer.music.load('./music.mp3')
+  # pygame.mixer.music.set_volume(0.1)
+  # pygame.mixer.music.play(-1)
   while True:
     screen.fill((0, 0, 0))
     r.render()
@@ -268,10 +283,14 @@ def jugar():
       if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
         exit(0)
       if e.type == pygame.KEYDOWN:
-        if e.key == pygame.K_a:
-          r.player["a"] -= pi/10
-        elif e.key == pygame.K_d:
-          r.player["a"] += pi/10
+        if e.key == pygame.K_d:
+          r.player["y"] += 10
+        elif e.key == pygame.K_a:
+          r.player["y"] -= 10
+        elif e.key == pygame.K_w:
+          r.player["x"] += 10
+        elif e.key == pygame.K_s:
+          r.player["x"] -= 10
 
         elif e.key == pygame.K_RIGHT:
           r.player["y"] += 10
@@ -283,8 +302,29 @@ def jugar():
           r.player["x"] -= 10
 
         print(r.player["x"], r.player["y"])
+        
 
-        if r.player["x"] > 365 and r.player["x"] < 395 and r.player["y"] > 65 and r.player["y"] < 115:
+        if r.player["x"] > 65 and r.player["x"] < 125 and r.player["y"] > 255 and r.player["y"] < 285:
+          pygame.mixer.Channel(0).play(pygame.mixer.Sound('./pokemongo.mp3'))
+          pygame.mixer.Channel(0).set_volume(0.3)
+
+        if r.player["x"] > 65 and r.player["x"] < 125 and r.player["y"] > 345 and r.player["y"] < 375:
+          pygame.mixer.Channel(0).play(pygame.mixer.Sound('./pokemongo.mp3'))
+          pygame.mixer.Channel(0).set_volume(0.3)
+
+        if r.player["x"] > 315 and r.player["x"] < 375 and r.player["y"] > 375 and r.player["y"] < 405:
+          pygame.mixer.Channel(0).play(pygame.mixer.Sound('./pokemongo.mp3'))
+          pygame.mixer.Channel(0).set_volume(0.3)
+        
+        if r.player["x"] > 265 and r.player["x"] < 355 and r.player["y"] > 275 and r.player["y"] < 305:
+          pygame.mixer.Channel(0).play(pygame.mixer.Sound('./pokemongo.mp3'))
+          pygame.mixer.Channel(0).set_volume(0.3)
+
+        if r.player["x"] > 335 and r.player["x"] < 395 and r.player["y"] > 185 and r.player["y"] < 205:
+          pygame.mixer.Channel(0).play(pygame.mixer.Sound('./pokemongo.mp3'))
+          pygame.mixer.Channel(0).set_volume(0.3)
+        
+        if r.player["x"] > 345 and r.player["x"] < 395 and r.player["y"] > 65 and r.player["y"] < 165:
           game_congrat()
 
         if e.key == pygame.K_f:
@@ -294,6 +334,7 @@ def jugar():
             pygame.display.set_mode((1000, 500),  pygame.DOUBLEBUF|pygame.HWACCEL|pygame.FULLSCREEN)
       
 
+    fps_counter(clock.tick(30))
     pygame.display.flip()
 
 game_intro()
